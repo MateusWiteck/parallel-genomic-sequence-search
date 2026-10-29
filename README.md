@@ -19,28 +19,32 @@ The goal is to improve execution time through algorithmic optimizations and para
 
 > These filenames and the directory structure are proposed conventions, not filenames mandated by the assignment. Implementations are not included in this initial repository scaffold.
 
-## Suggested repository structure
+## Repository structure
 
 ```text
 parallel-genomic-sequence-search/
 ├── README.md
+├── Makefile
 ├── src/
-│   ├── baseline_sequential.c
-│   ├── baseline_parallel.c
-│   ├── optimized_sequential.c
-│   └── optimized_parallel.c
+│   └── ... implementation sources ...
+├── test/
+│   ├── pattern-files/
+│   └── files-to-match/
+├── reference/
+│   ├── busca-cadeia.c
+│   └── mede_time.h
 ├── scripts/
 │   └── aumentar-arquivo
-├── data/
-│   ├── arquivo1
-│   └── arquivo2-0
+├── docs/
+│   ├── Enunciado do Projeto 2026.pdf
+│   └── PROJETO_TESTES_ADICIONAIS.pdf
 ├── benchmarks/
 │   ├── results/
 │   └── plots/
 └── report/
 ```
 
-The reference code, sample inputs, and `aumentar-arquivo` utility are supplied through the course Moodle. Large generated input files should not be committed to Git.
+The supplied reference implementation and timer header are kept under `reference/`, the input-generation utility is under `scripts/`, and assignment PDFs are under `docs/`. Add implementation sources under `src/`. Keep paired test inputs under `test/` with matching filename suffixes (for example, `arquivo1-grp-t1` and `arquivo2-grp-t1`). Large generated benchmark inputs should not be committed to Git.
 
 ## Benchmark plan
 
