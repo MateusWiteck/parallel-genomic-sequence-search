@@ -25,6 +25,7 @@ def compile_programs(build_dir: Path) -> dict[str, Path]:
     sources = {
         "reference": ROOT / "reference/busca-cadeia.c",
         "parallel": ROOT / "src/busca-paralela.c",
+        "sequential-optimized": ROOT / "src/busca-cadeia-otimizado.c",
     }
 
     executables = {}
@@ -80,6 +81,7 @@ def check_counts(programs: dict[str, Path], pattern: Path, target: Path) -> int:
     counts = {
         "reference": run_program(programs["reference"], pattern, target)[0],
         "parallel": run_program(programs["parallel"], pattern, target, threads=4)[0],
+        "sequential-optimized": run_program(programs["sequential-optimized"], pattern, target)[0],
     }
     if len(set(counts.values())) != 1:
         raise RuntimeError(f"Count mismatch for {pattern.name} / {target.name}: {counts}")
@@ -109,7 +111,7 @@ def check_scaled_counts(programs: dict[str, Path], pattern: Path) -> None:
 def benchmark_configurations():
     """Yield (group, size, program, thread count) rows to time."""
     for size in SIZES:
-        for program, threads in (("reference", 1), ("parallel", 4)):
+        for program, threads in (("reference", 1), ("parallel", 4), ("sequential-optimized", 1)):
             yield f"size-{size}x", size, program, threads
 
     for threads in THREAD_COUNTS:
