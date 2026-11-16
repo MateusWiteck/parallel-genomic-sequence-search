@@ -30,7 +30,7 @@ def compile_programs(build_dir: Path) -> dict[str, Path]:
 
     executables = {}
     for name, source in sources.items():
-        flags = [] if name == "reference" else ompflags
+        flags = ompflags if name == "parallel" else []
         executable = build_dir / name
         subprocess.run(compiler + cflags + flags + [str(source), "-o", str(executable)], check=True)
         executables[name] = executable

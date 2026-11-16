@@ -13,39 +13,26 @@
     FILE *f1;
     FILE *f2;
 char sequencia_busca[MAX_LINHAS_arquivo1][SIZE];
+size_t tamanhos_busca[MAX_LINHAS_arquivo1];
 const char *arquivo2_mapeado;
 long arq2_size;
 int busca_linha(long *i_seq,long i_linha_seq_busca)
 {
-  char buff[SIZE];
-  int achou_linha,i;
-  int size_seq;
-  int size_sequencia_busca;
-  size_sequencia_busca=strlen(sequencia_busca[i_linha_seq_busca]);
-  // Copia linha atual
-  int bytes_lidos = 0;
-  while (*i_seq + bytes_lidos < arq2_size && bytes_lidos < SIZE - 1) {
-    char c = arquivo2_mapeado[*i_seq + bytes_lidos];
-    buff[bytes_lidos++] = c;
-    if (c == '\n')
-      break;
-  }
-  buff[bytes_lidos] = '\0';
-  // Comparacao da sequencia na linha em arq2 com a sequencia em arq1
-  size_seq=strlen(buff);
-  *i_seq=*i_seq+size_seq;
-  achou_linha=FALSE;
-  if (size_sequencia_busca == size_seq){
-       achou_linha = TRUE;
-       for(i = 0; i < (size_sequencia_busca-1); i++){
-	    if(sequencia_busca[i_linha_seq_busca][i] != buff[i]){
-	         i++;
-                 achou_linha = FALSE;
-	    	 break;
-            }
-        }
-   }
-   return(achou_linha);
+  const char *inicio = arquivo2_mapeado + *i_seq;
+  size_t restantes = (size_t)(arq2_size - *i_seq);
+  const char *newline = memchr(inicio, '\n', restantes);
+  size_t tamanho = newline != NULL ? (size_t)(newline - inicio) : restantes;
+
+  // Avanca alem da linha
+  *i_seq += (long)tamanho;
+  if(newline != NULL) // Contar o \n 
+    *i_seq += 1;
+  if (newline != NULL && tamanho > 0 && inicio[tamanho - 1] == '\r')
+    tamanho--;
+
+  // Verificar se a linha na memoria mapeada = linha no vetor
+  return tamanho == tamanhos_busca[i_linha_seq_busca] &&
+         memcmp(sequencia_busca[i_linha_seq_busca], inicio, tamanho) == 0;
 } 
 int main(int argc, char *argv[])
 {
@@ -113,6 +100,16 @@ fflush(stdout);
     linha=0;
     while (linha < MAX_LINHAS_arquivo1 &&
            fgets(sequencia_busca[linha], SIZE, f1) != NULL) {
+      // Guarda o tamanho da linha
+      size_t tamanho = strlen(sequencia_busca[linha]);
+
+      //Desconsidera CRLF
+      if (tamanho > 0 && sequencia_busca[linha][tamanho - 1] == '\n') {
+        tamanho--;
+        if (tamanho > 0 && sequencia_busca[linha][tamanho - 1] == '\r')
+          tamanho--;
+      }
+      tamanhos_busca[linha] = tamanho;
       linha++;
     }
     if (linha == 0 || (linha == MAX_LINHAS_arquivo1 && fgetc(f1) != EOF)) {

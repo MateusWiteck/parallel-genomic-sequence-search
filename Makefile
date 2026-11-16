@@ -11,14 +11,14 @@ RUNALL_GOAL := $(firstword $(filter runall-%,$(MAKECMDGOALS)))
 RUN_GOAL := $(firstword $(filter run-%,$(MAKECMDGOALS)))
 ifeq ($(RUNALL_GOAL),)
 ifeq ($(RUN_GOAL),)
-PROGRAM := $(firstword $(filter-out all clean test-search benchmark-search benchmark-inputs run-% runall-%,$(MAKECMDGOALS)))
+PROGRAM := $(firstword $(filter-out all clean test-search benchmark-search benchmark-inputs benchmark-all-tests run-% runall-%,$(MAKECMDGOALS)))
 else
 PROGRAM := $(patsubst run-%,%,$(RUN_GOAL))
 endif
 else
 PROGRAM := $(patsubst runall-%,%,$(RUNALL_GOAL))
 endif
-INPUT_SUFFIX := $(firstword $(filter-out all clean test-search benchmark-search benchmark-inputs $(PROGRAM) $(RUN_GOAL) $(RUNALL_GOAL),$(MAKECMDGOALS)))
+INPUT_SUFFIX := $(firstword $(filter-out all clean test-search benchmark-search benchmark-inputs benchmark-all-tests $(PROGRAM) $(RUN_GOAL) $(RUNALL_GOAL),$(MAKECMDGOALS)))
 ifeq ($(INPUT_SUFFIX),)
 PATTERN_FILE := $(PATTERN_DIR)/arquivo1
 TARGET_FILE := $(TARGET_DIR)/arquivo2-0
@@ -39,12 +39,16 @@ TARGET_FILE := $(HYPHEN_TARGET)
 endif
 endif
 
-.PHONY: all clean test-search benchmark-search benchmark-inputs $(INPUT_SUFFIX)
+.PHONY: all clean test-search benchmark-search benchmark-inputs benchmark-all-tests $(INPUT_SUFFIX)
 
 all:
 	@echo "Use 'make <program> [suffix]', 'make run-<program> [suffix]', or 'make runall-<program>'."
 	@echo "Programs in src/ are built by filename; e.g. 'make optimized_sequential grp-t1'."
 	@echo "Use 'make test-search' for fixture correctness or 'make benchmark-search' for assignment scaling."
+	@echo "Use 'make benchmark-all-tests' to benchmark all paired fixtures."
+
+benchmark-all-tests:
+	python3 scripts/all_tests.py
 
 test-search:
 	python3 scripts/assignment_benchmark.py --correctness-only

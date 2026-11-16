@@ -1,2 +1,4 @@
 .clangd
 /benchmarks/inputs/
+
+*/__pycache__/*
